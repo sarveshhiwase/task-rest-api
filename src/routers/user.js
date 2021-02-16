@@ -3,29 +3,25 @@ const User = require("../models/user");
 const auth = require("../middleware/auth");
 const multer = require("multer");
 const sharp = require("sharp");
-const sendEmail = require("../emails/account");
+const request = require('request');
+const axios = require('axios')
+const fs = require('fs');
+const path = require('path')
 
-const welcomeMessage = (name) =>
-  `Thanks for Using Our API, Welcome ${name} I hope You Enjoy.`;
-const CancelingMessage = (name) =>
-  `GoodBye ${name}, I hope we see you comeback again anytime soon.`;
-const signUpmsg = "WELCOME to TASK API";
-const deleteMsg = "CANCELING TASK API SERVICE";
+
 
 const router = new express.Router();
 router.post("/users", async (req, res) => {
+  // console.log(__dirname);
+  const imagedata = fs.readFileSync(path.join(__dirname, "../avatar"))
+  req.body.avatar = imagedata;
+
   const newuser = new User(req.body);
 
   try {
     await newuser.save();
-
-    sendEmail(
-      newuser.email,
-      signUpmsg.toLowerCase(),
-      welcomeMessage(newuser.name)
-    );
     const token = await newuser.generateAuthToken();
-    res.status(201).send({ user: newuser, token });
+    res.status(201).send({ user: newuser, token, clientinfo: req.ClientInfo });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -40,14 +36,14 @@ router.post("/users/login", async (req, res) => {
 
     const token = await user.generateAuthToken();
 
-    res.send({ user, token });
+    res.send({ user, token,clientinfo: req.ClientInfo  });
   } catch (error) {
     res.status(400).send();
   }
 });
 
 router.get("/users/me", auth, async (req, res) => {
-  res.send(req.user);
+  res.send({user: req.user,clientinfo: req.ClientInfo });
 });
 
 router.post("/users/logout", auth, async (req, res) => {
@@ -86,7 +82,7 @@ router.patch("/users/me", auth, async (req, res) => {
     updates.forEach((update) => (req.user[update] = req.body[update]));
     await req.user.save();
 
-    res.send(req.user);
+    res.send({user: req.user,clientinfo: req.ClientInfo });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -95,12 +91,7 @@ router.patch("/users/me", auth, async (req, res) => {
 router.delete("/users/me", auth, async (req, res) => {
   try {
     await req.user.remove();
-    sendEmail(
-      req.user.email,
-      deleteMsg.toLowerCase(),
-      CancelingMessage(req.user.name)
-    );
-    res.send(req.user);
+    res.send({user: req.user,clientinfo: req.ClientInfo });
   } catch (e) {
     res.status(500).send();
   }
@@ -157,6 +148,7 @@ router.delete("/users/me/avatar", auth, async (req, res) => {
 router.get("/users/:id/avatar", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
+    // console.log(user)
     if (!user || !user.avatar) {
       throw new Error();
     }
@@ -164,7 +156,8 @@ router.get("/users/:id/avatar", async (req, res) => {
     res.set("Content-Type", "image/jpg");
     res.send(user.avatar);
   } catch (error) {
-    res.send(400).send(e);
+    console.log(error)
+    res.sendStatus(400);
   }
 });
 

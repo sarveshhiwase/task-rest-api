@@ -1,9 +1,10 @@
 const express = require("express");
 const Task = require("../models/tasks");
 const auth = require("../middleware/auth");
+// const getip = require("../middleware/getip");
 
 const router = new express.Router();
-
+// router.use(getip)
 router.get("/tasks", auth, async (req, res) => {
   const match = {};
   const sort = {};
