@@ -13,7 +13,7 @@ const app = express();
 const corsOptions = {
   origin: process.env.ORIGIN,
 };
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(getip);
 
 app.use(express.json());

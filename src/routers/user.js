@@ -36,7 +36,8 @@ router.post("/users/login", async (req, res) => {
 
     res.send({ user, token, clientinfo: req.ClientInfo });
   } catch (error) {
-    res.status(400).send();
+    // console.log(`${error} is beast`)
+    res.status(400).send({error: error.message});
   }
 });
 
@@ -52,7 +53,9 @@ router.post("/users/logout", auth, async (req, res) => {
     await req.user.save();
     res.send();
   } catch (error) {
-    res.status(500).send();
+    console.log(error)
+
+    res.status(500).send({error: error.message});
   }
 });
 
@@ -61,8 +64,10 @@ router.post("/users/logoutAll", auth, async (req, res) => {
     req.user.tokens = [];
     await req.user.save();
     res.send();
-  } catch (e) {
-    res.status(500).send();
+  } catch (error) {
+    console.log(error)
+
+    res.status(500).send({error: error.message});
   }
 });
 
@@ -81,8 +86,10 @@ router.patch("/users/me", auth, async (req, res) => {
     await req.user.save();
 
     res.send({ user: req.user, clientinfo: req.ClientInfo });
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (error) {
+    console.log(error)
+
+    res.status(400).send({error: error.message});
   }
 });
 
@@ -91,7 +98,9 @@ router.delete("/users/me", auth, async (req, res) => {
     await req.user.remove();
     res.send({ user: req.user, clientinfo: req.ClientInfo });
   } catch (e) {
-    res.status(500).send();
+    console.log(error)
+
+    res.status(500).send({error: error.message});
   }
 });
 
@@ -139,7 +148,9 @@ router.delete("/users/me/avatar", auth, async (req, res) => {
     await req.user;
     res.send();
   } catch (error) {
-    res.send(500).send(e);
+    console.log(error)
+
+    res.send(500).send({error: error.message});
   }
 });
 
