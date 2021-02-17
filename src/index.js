@@ -1,6 +1,6 @@
 const express = require("express");
-const cors = require('cors');
-const getip = require('./middleware/getip')
+const cors = require("cors");
+const getip = require("./middleware/getip");
 const cl = console.log;
 require("./db/dbconnect");
 
@@ -11,10 +11,10 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 const corsOptions = {
-	origin: 'https://taskify.vercel.app'
-}
-app.use(cors())
-app.use(getip)
+  origin: process.env.ORIGIN,
+};
+app.use(cors());
+app.use(getip);
 
 app.use(express.json());
 app.use(userRouter);

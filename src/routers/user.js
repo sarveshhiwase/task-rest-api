@@ -4,16 +4,14 @@ const auth = require("../middleware/auth");
 const multer = require("multer");
 const sharp = require("sharp");
 // const request = require('request');
-const axios = require('axios')
-const fs = require('fs');
-const path = require('path')
-
-
+const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
 const router = new express.Router();
 router.post("/users", async (req, res) => {
   // console.log(__dirname);
-  const imagedata = fs.readFileSync(path.join(__dirname, "../avatar"))
+  const imagedata = fs.readFileSync(path.join(__dirname, "../avatar"));
   req.body.avatar = imagedata;
 
   const newuser = new User(req.body);
@@ -36,14 +34,14 @@ router.post("/users/login", async (req, res) => {
 
     const token = await user.generateAuthToken();
 
-    res.send({ user, token,clientinfo: req.ClientInfo  });
+    res.send({ user, token, clientinfo: req.ClientInfo });
   } catch (error) {
     res.status(400).send();
   }
 });
 
 router.get("/users/me", auth, async (req, res) => {
-  res.send({user: req.user,clientinfo: req.ClientInfo });
+  res.send({ user: req.user, clientinfo: req.ClientInfo });
 });
 
 router.post("/users/logout", auth, async (req, res) => {
@@ -82,7 +80,7 @@ router.patch("/users/me", auth, async (req, res) => {
     updates.forEach((update) => (req.user[update] = req.body[update]));
     await req.user.save();
 
-    res.send({user: req.user,clientinfo: req.ClientInfo });
+    res.send({ user: req.user, clientinfo: req.ClientInfo });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -91,7 +89,7 @@ router.patch("/users/me", auth, async (req, res) => {
 router.delete("/users/me", auth, async (req, res) => {
   try {
     await req.user.remove();
-    res.send({user: req.user,clientinfo: req.ClientInfo });
+    res.send({ user: req.user, clientinfo: req.ClientInfo });
   } catch (e) {
     res.status(500).send();
   }
@@ -156,7 +154,7 @@ router.get("/users/:id/avatar", async (req, res) => {
     res.set("Content-Type", "image/jpg");
     res.send(user.avatar);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.sendStatus(400);
   }
 });
